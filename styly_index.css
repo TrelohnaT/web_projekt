@@ -92,7 +92,7 @@
     margin-left: 5px;
     margin-right: 5px;
     border: solid;
-    border-color:gray;
+    border-color:white;
     border-width: 3px;
 }
 
@@ -102,3 +102,52 @@
     border-color: black;
     border-width: 3px;
 }
+
+.block_fuky
+{
+    background-color: pink;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color:pink;
+    border-width: 3px;
+}
+
+.block_fuky:hover
+{
+    border: solid;
+    border-color: black;
+    border-width: 3px;
+}
+
+.block_food
+{
+    background-color: darkorange;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color: darkorange;
+    border-width: 3px;
+}
+
+.block_food:hover
+{
+    border: solid;
+    border-color: black;
+    border-width: 3px;
+}
+
+
+
+
+
