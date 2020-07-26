@@ -1,0 +1,212 @@
+#body
+{
+    font-family: Arial, Helvetica, sans-serif;
+    height: 100%;
+    background-color: lightskyblue;
+}
+
+#welcome
+{
+    background-color: darkorange;
+    width: 600px;
+    margin-left: 20%;
+}
+
+#play_ground
+{
+    position: relative;
+    text-align: center;
+    background-color: lightgray;
+    height: 600px;
+    width: 600px;
+    margin-left: 25%;
+    float: left;
+
+}
+
+#menu
+{
+    float: left;
+}
+
+#line
+{
+    margin: 0px;
+    padding: 0px;
+    float: left;
+}
+
+.block_field
+{
+    background-color: lightgreen;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color:lightgreen;
+    border-width: 3px;
+    
+}
+
+.block_field:hover
+{
+    border: solid;
+    border-color: black;
+    border-width: 3px;
+}
+
+.block_wather
+{
+    background-color: steelblue;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color:steelblue;
+    border-width: 3px;
+}
+
+.block_wather:hover
+{
+    border: solid;
+    border-color: black;
+    border-width: 3px;
+}
+
+.block_empty
+{
+    background-color: white;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color:white;
+    border-width: 3px;
+}
+
+.block_empty:hover
+{
+    border: solid;
+    border-color: black;
+    border-width: 3px;
+}
+
+.block_fuky
+{
+    background-color: pink;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color:pink;
+    border-width: 3px;
+}
+
+.block_fuky:hover
+{
+    border: solid;
+    border-color: black;
+    border-width: 3px;
+}
+
+.block_food
+{
+    background-color: darkorange;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color: darkorange;
+    border-width: 3px;
+}
+
+.block_food:hover
+{
+    border: solid;
+    border-color: black;
+    border-width: 3px;
+}
+
+.block_footprint_1
+{
+    background-color: seagreen;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color:seagreen;
+    border-width: 3px;
+}
+
+.block_footprint_2
+{
+    background-color: green;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color: green;
+    border-width: 3px;
+}
+
+.block_footprint_3
+{
+    background-color: olive;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color: olive;
+    border-width: 3px;
+}
+
+.block_footprint_4
+{
+    background-color: darkolivegreen;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: solid;
+    border-color: darkolivegreen;
+    border-width: 3px;
+}
+
+
+
+
