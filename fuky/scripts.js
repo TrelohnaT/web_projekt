@@ -21,10 +21,16 @@
         var food_x = -1;
         var food_y = -1;
 
+        var food_found = 0;             //kolikrát našel jídlo
+
         var footprint_value = 1;        //hodnota bloku (stopy) na bloku na kterém stojí
+
+        var last_direction = 0;         //poslední směr kterým se pohyboval
 
         var RN = 0;                     //Random Number
 
+
+        var next_place;
 
         /*
         ** tato funkce slouží k měnění barvu čtverečků
@@ -150,41 +156,15 @@
                 {
                     await sleep(500);
                     RNG();
-                    document.getElementById("RNG").innerHTML = RN;
-                    if(RN == 1)
-                    {
-                        if(fuky_x < food_x)
-                        {
-                            move_x_plus();
-
-                        }
-
-                        else if(fuky_x > food_x)
-                        {
-                            move_x_minus();
-
-                        }
-                    }
-
-                    else if(RN == 2)
-                    {
-                        if(fuky_y < food_y)
-                        {
-                            move_y_plus();
-
-                        }
-
-                        else if(fuky_y > food_y)
-                        {
-                            move_y_minus();
-
-                        }
-                    }
+                    scan();
+                    
                 }
+                //fuky našel jídlo
                 if(fuky_x == food_x && fuky_y == food_y)
                 {
                     food_x = -1;
                     food_y = -1;
+                    last_direction = 0;
                 }
             }
             else
@@ -208,7 +188,10 @@
                 fuky_y = fuky_y+1;
                 see_footprint(fuky_x, fuky_y);
                 document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_fuky");
+                last_direction = 4;
+                return;
             }
+            return;
         }
 
         /*fukce pro posun v ose Y do minusu */
@@ -220,7 +203,10 @@
                 fuky_y = fuky_y-1;
                 see_footprint(fuky_x, fuky_y);
                 document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_fuky");
+                last_direction = 3;
+                return;
             }
+            return;
         }
 
         /*funkce pro posun v ose X do plusu */
@@ -233,7 +219,10 @@
                 fuky_x = fuky_x+1;
                 see_footprint(fuky_x, fuky_y);
                 document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_fuky");
+                last_direction = 2;
+                return;
             }
+            return;
         }
 
         /*funkce pro prosun v ose X do minusu */
@@ -246,16 +235,236 @@
                 fuky_x = fuky_x-1;
                 see_footprint(fuky_x, fuky_y);
                 document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_fuky");
-            }  
+                last_direction = 1;
+                return;    
+            }
+            return;
         }
 
-        function scan_footprints()
+        function RNG_move()
         {
-            return(Math.max(scaning(fuky_x+1, fuky_y), scaning(fuky_x-1, fuky_y), scaning(fuky_x, fuky_y+1), scaning(fuky_x, fuky_y-1)));
+            if(RN == 1)
+            {
+                if(fuky_x > food_x)
+                {
+                    if(last_direction != 2)
+                    {
+                        move_x_minus();
+                        return;
+                    }
+                }
+                else if(fuky_x < food_x)
+                {
+                    if(last_direction != 1)
+                    {
+                        move_x_plus();
+                        return;
+                    }
+                }
+            }
+            else if(RN == 2)
+            {
+                if(fuky_y > food_y)
+                {
+                    if(last_direction != 4)
+                    {
+                        move_y_minus();
+                        return;
+                    }
+                }
+                else if(fuky_y < food_y)
+                {
+                    if(last_direction != 3)
+                    {
+                        move_y_plus();
+                        return;
+                    }
+                }   
+            }
+            return;
+        }
+
+        function scan()
+        {
+            var arr;
+            document.getElementById("RNG").innerHTML ="last" + last_direction;
+            if(last_direction == 4)
+            {
+                arr = [scaning(fuky_x+1, fuky_y), scaning(fuky_x-1, fuky_y), scaning(fuky_x, fuky_y+1)];
+                
+                if((arr[0] == arr[1]) && (arr[1] == arr[2]))
+                {
+                    RNG_move();
+                    return;
+                }
+                
+                //poličko s nejvetšim ohodnocenim je v pravo
+                if(arr.indexOf(Math.max.apply(Math, arr)) == 0)
+                {
+                    move_x_plus();
+                    return;
+                }
+                //poličko s nejvetším ohodnocením je v levo
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 1)
+                {
+                    move_x_minus();
+                    return;
+                }
+                //poličko s nejvetším ohodnocením je dole
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 2)
+                {
+                    move_y_plus();
+                    return;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else if(last_direction == 3)
+            {
+                arr = [scaning(fuky_x+1,fuky_y), scaning(fuky_x-1, fuky_y), scaning(fuky_x, fuky_y-1)];
+                
+                if((arr[0] == arr[1]) && (arr[1] == arr[2]))
+                {
+                    RNG_move();
+                    return;
+                }
+
+                //poličko s nejvetšim ohodnocenim je v pravo
+                if(arr.indexOf(Math.max.apply(Math, arr)) == 0)
+                {
+                    move_x_plus();
+                    return;
+                }
+                //poličko s nejvetším ohodnocením je v levo
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 1)
+                {
+                    move_x_minus();
+                    return;
+                }
+                //políčko s největším ohodnocením na nahore
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 2)
+                {
+                    move_y_minus();
+                    return;
+                }
+                //pokud mají všechna políčka stejné ohodnoceni
+                else
+                {
+                    return 0;
+                }
+            }
+            else if(last_direction == 2)
+            {
+                arr = [scaning(fuky_x+1, fuky_y), scaning(fuky_x, fuky_y+1), scaning(fuky_x, fuky_y-1)];
+                
+                if((arr[0] == arr[1]) && (arr[1] == arr[2]))
+                {
+                    RNG_move();
+                    return;
+                }
+                
+                //poličko s nejvetšim ohodnocenim je v pravo
+                if(arr.indexOf(Math.max.apply(Math, arr)) == 0)
+                {
+                    move_x_plus();
+                    return;
+                }
+                //poličko s nejvetším ohodnocením je dole
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 1)
+                {
+                    move_y_plus();
+                    return;
+                }
+                //políčko s největším ohodnocením na nahore
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 2)
+                {
+                    move_y_minus();
+                    return;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else if(last_direction == 1)
+            {
+                arr = [scaning(fuky_x-1, fuky_y), scaning(fuky_x, fuky_y+1), scaning(fuky_x, fuky_y-1)];
+                
+                if((arr[0] == arr[1]) && (arr[1] == arr[2]))
+                {
+                    RNG_move();
+                    return;
+                }
+
+                //poličko s nejvetším ohodnocením je v levo
+                if(arr.indexOf(Math.max.apply(Math, arr)) == 0)
+                {
+                    move_x_minus();
+                    return;
+                }
+                //poličko s nejvetším ohodnocením je dole
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 1)
+                {
+                    move_y_plus();
+                    return;
+                }
+                //políčko s největším ohodnocením na nahore
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 2)
+                {
+                    move_y_minus();
+                    return;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            //tento else se provede vždy po spušteni hledání
+            else
+            {
+
+                arr = [scaning(fuky_x+1, fuky_y), scaning(fuky_x-1, fuky_y), scaning(fuky_x, fuky_y+1), scaning(fuky_x, fuky_y-1)];
+                if((arr[0] == arr[1]) && (arr[1] == arr[2]) && (arr[2] == arr[3]))
+                {
+                    RNG_move();
+                    return;
+                }
+                //poličko s nejvetšim ohodnocenim je v pravo
+                if(arr.indexOf(Math.max.apply(Math, arr)) == 0)
+                {
+                    move_x_plus();
+                }
+                //poličko s nejvetším ohodnocením je v levo
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 1)
+                {
+                    move_x_minus();
+                }
+                //poličko s nejvetším ohodnocením je dole
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 2)
+                {
+                    move_y_plus();
+                }
+                //poličko s nejvetším ohodnocením je nahore
+                else if(arr.indexOf(Math.max.apply(Math, arr)) == 3)
+                {
+                    move_y_minus();
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        
         }
 
         function scaning(x, y)
         {
+            if((x == -1 || x == 9) || (y == -1 || y == 9))
+            {      
+                return -2;
+            }
             if(document.getElementById(x + "_" + y).getAttribute("class") == "block_field")
             {
                 return 0;
@@ -288,6 +497,8 @@
             {
                 return -1;
             }
+            return-2;
+            
         }
 
         /*
