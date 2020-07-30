@@ -5,10 +5,10 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.center
+#center
 {
     width: 96%;
-    height: 950px;
+    height: 100%;
     margin-left: 2%;
     margin-right: 2%;
     background-image: url("images/PpP_index_back.png");
@@ -49,7 +49,7 @@
 
 .menu
 {
-    height: 400px;
+    height: 95%;
     text-align: center;
 }
 
@@ -62,22 +62,34 @@
     font-weight: bolder;
 }
 
-.fuky a
+.fuky
 {
+    text-align: center;
     width: 200px;
     height: 200px;
     background-color: pink;
-    float: left;
-    margin-left: 25%;
 }
 
-.o_mne a
+
+.o_mne
 {
     width: 200px;
     height: 200px;
-    background-color: green;
-    float: left;
-    margin-left: 15%;
+    background-color: orange;
+}
+
+.farm
+{
+    width: 200px;
+    height: 200px;
+    background-color: limegreen;
+}
+
+.mine
+{
+    width: 200px;
+    height: 200px;
+    background-color: darkgray;
 }
 
 .foot

@@ -29,6 +29,8 @@
 
         var RN = 0;                     //Random Number
 
+        var last_pythagor_distace;      //Pythagorova vzdálenost z předešlého políčka
+
 
         var next_place;
 
@@ -60,8 +62,6 @@
                         document.getElementById(x + "_" + y).setAttribute("class", "block_fuky");
                         fuky_x = x;
                         fuky_y = y;
-                        /* test */
-                        document.getElementById("test").innerHTML = "x:" + fuky_x + " y:" + fuky_y;
                     }
                 }
                 else if(state == 5)
@@ -71,9 +71,6 @@
                         document.getElementById(x + "_" + y).setAttribute("class", "block_food");
                         food_x = x;
                         food_y = y;
-                        /* test */
-                        document.getElementById("test").innerHTML = "x:" + food_x + " y:" + food_y;
-
                     }
                 }
                 
@@ -156,8 +153,7 @@
                 {
                     await sleep(500);
                     RNG();
-                    scan();
-                    
+                    think_and_move();
                 }
                 //fuky našel jídlo
                 if(fuky_x == food_x && fuky_y == food_y)
@@ -184,6 +180,7 @@
         {
             if(food_y >= 0 && food_y <= 8)
             {
+                last_pythagor_distace = pythagor(fuky_x, fuky_y, food_x, food_y);
                 leave_footprint(footprint_value);
                 fuky_y = fuky_y+1;
                 see_footprint(fuky_x, fuky_y);
@@ -199,6 +196,7 @@
         {
             if(food_y >= 0 && food_y <= 8)
             {
+                last_pythagor_distace = pythagor(fuky_x, fuky_y, food_x, food_y);
                 leave_footprint(footprint_value);
                 fuky_y = fuky_y-1;
                 see_footprint(fuky_x, fuky_y);
@@ -214,7 +212,7 @@
         {
             if(food_x >= 0 && food_x <= 8)
             {
-                document.getElementById("test").innerHTML = "value: " + footprint_value;
+                last_pythagor_distace = pythagor(fuky_x, fuky_y, food_x, food_y);
                 leave_footprint(footprint_value);
                 fuky_x = fuky_x+1;
                 see_footprint(fuky_x, fuky_y);
@@ -230,7 +228,7 @@
         {
             if(food_x >= 0 && food_x <= 8)
             {
-                document.getElementById("test").innerHTML = "value: " + footprint_value;
+                last_pythagor_distace = pythagor(fuky_x, fuky_y, food_x, food_y);
                 leave_footprint(footprint_value);
                 fuky_x = fuky_x-1;
                 see_footprint(fuky_x, fuky_y);
@@ -284,14 +282,19 @@
             return;
         }
 
-        function scan()
+        function think_and_move()
         {
             var arr;
-            document.getElementById("RNG").innerHTML ="last" + last_direction;
+            var pythagor_distace = pythagor(fuky_x, fuky_y, food_x, food_y);
+            document.getElementById("RNG").innerHTML ="last " + last_direction;
+            document.getElementById("test").innerHTML = "pythagor " + pythagor_distace;
+
             if(last_direction == 4)
             {
+                /*zjišťování ohodnocení okolních políček */
                 arr = [scaning(fuky_x+1, fuky_y), scaning(fuky_x-1, fuky_y), scaning(fuky_x, fuky_y+1)];
                 
+                /*Pokud jsou mají všechny okolní políčka stejnou hodnotu */
                 if((arr[0] == arr[1]) && (arr[1] == arr[2]))
                 {
                     RNG_move();
@@ -323,8 +326,10 @@
             }
             else if(last_direction == 3)
             {
+                /*zjišťování ohodnocení okolních políček */
                 arr = [scaning(fuky_x+1,fuky_y), scaning(fuky_x-1, fuky_y), scaning(fuky_x, fuky_y-1)];
                 
+                /*Pokud jsou mají všechny okolní políčka stejnou hodnotu */
                 if((arr[0] == arr[1]) && (arr[1] == arr[2]))
                 {
                     RNG_move();
@@ -357,8 +362,10 @@
             }
             else if(last_direction == 2)
             {
+                /*zjišťování ohodnocení okolních políček */
                 arr = [scaning(fuky_x+1, fuky_y), scaning(fuky_x, fuky_y+1), scaning(fuky_x, fuky_y-1)];
                 
+                /*Pokud jsou mají všechny okolní políčka stejnou hodnotu */
                 if((arr[0] == arr[1]) && (arr[1] == arr[2]))
                 {
                     RNG_move();
@@ -390,8 +397,10 @@
             }
             else if(last_direction == 1)
             {
+                /*zjišťování ohodnocení okolních políček */
                 arr = [scaning(fuky_x-1, fuky_y), scaning(fuky_x, fuky_y+1), scaning(fuky_x, fuky_y-1)];
                 
+                /*Pokud jsou mají všechny okolní políčka stejnou hodnotu */
                 if((arr[0] == arr[1]) && (arr[1] == arr[2]))
                 {
                     RNG_move();
@@ -424,7 +433,7 @@
             //tento else se provede vždy po spušteni hledání
             else
             {
-
+                /*zjišťování ohodnocení okolních políček */
                 arr = [scaning(fuky_x+1, fuky_y), scaning(fuky_x-1, fuky_y), scaning(fuky_x, fuky_y+1), scaning(fuky_x, fuky_y-1)];
                 if((arr[0] == arr[1]) && (arr[1] == arr[2]) && (arr[2] == arr[3]))
                 {
@@ -435,21 +444,25 @@
                 if(arr.indexOf(Math.max.apply(Math, arr)) == 0)
                 {
                     move_x_plus();
+                    return;
                 }
                 //poličko s nejvetším ohodnocením je v levo
                 else if(arr.indexOf(Math.max.apply(Math, arr)) == 1)
                 {
                     move_x_minus();
+                    return;
                 }
                 //poličko s nejvetším ohodnocením je dole
                 else if(arr.indexOf(Math.max.apply(Math, arr)) == 2)
                 {
                     move_y_plus();
+                    return;
                 }
                 //poličko s nejvetším ohodnocením je nahore
                 else if(arr.indexOf(Math.max.apply(Math, arr)) == 3)
                 {
                     move_y_minus();
+                    return;
                 }
                 else
                 {
@@ -467,7 +480,7 @@
             }
             if(document.getElementById(x + "_" + y).getAttribute("class") == "block_field")
             {
-                return 0;
+                return 0,5;
             }
             else if(document.getElementById(x + "_" + y).getAttribute("class") == "block_footprint_1")
             {
@@ -495,7 +508,7 @@
             }
             else if(document.getElementById(x + "_" + y).getAttribute("class") == "block_wather")
             {
-                return -1;
+                return -2;
             }
             return-2;
             
@@ -560,6 +573,15 @@
             {
                 document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_footprint_4");
             }
+        }
+
+        /*
+        ** Pythagorova veta pro pocítání príme vzdálenosti fukyho od jídla
+        ** vyuzito pri detekování zacyklení
+        */
+        function pythagor(fuky_x, fuky_y, food_x, food_y)
+        {
+           return(Math.sqrt(Math.pow(Math.abs(fuky_x - food_x), 2) + (Math.pow(Math.abs(fuky_y - food_y), 2)))); 
         }
 
 
