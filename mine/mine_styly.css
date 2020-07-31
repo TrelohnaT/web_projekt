@@ -9,7 +9,7 @@
 {
     position: relative;
     text-align: center;
-    background-color: lightgray;
+    background-color: skyblue;
     height: 100%;
     width: 120%px;
     margin-left: 25%;
@@ -26,24 +26,10 @@
 
 .block_empty
 {
-    background-color: white;
+    background-color: skyblue;
     width: 50px;
     height: 50px;
     padding: 0px;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    margin-left: 1px;
-    margin-right: 1px;
-    border: solid;
-    border-color:white;
-    border-width: 3px;
-}
-
-.block_empty:hover
-{
-    border: solid;
-    border-color: black;
-    border-width: 3px;
 }
 
 .block_field
@@ -52,33 +38,52 @@
     width: 50px;
     height: 50px;
     padding: 0px;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    margin-left: 1px;
-    margin-right: 1px;
-    border: solid;
-    border-color:lightgreen;
-    border-width: 3px;
 }
 
-.block_field:hover
+.block_fuky_right_empty
 {
-    border: solid;
-    border-color: black;
-    border-width: 3px;
-}
-
-.block_fuky
-{
-    background-image: url("../images/farm/texture_50-50_fuky_farm.png");
+    background-image: url("../images/mine/texture_50-50_miner_right_empty.png");
     width: 50px;
     height: 50px;
     padding: 0px;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    margin-left: 1px;
-    margin-right: 1px;
-    border: solid;
-    border-color:lightgreen;
 }
 
+.block_fuky_left_empty
+{
+    background-image: url("../images/mine/texture_50-50_miner_left_empty.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
+
+.block_fuky_right_gold
+{
+    background-image: url("../images/mine/texture_50-50_miner_right_gold.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
+
+.block_fuky_left_gold
+{
+    background-image: url("../images/mine/texture_50-50_miner_left_gold.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
+
+.block_stone
+{
+    background-image: url("../images/mine/texture_50-50_stone.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
+
+.block_grass
+{
+    background-image: url("../images/mine/texture_50-50_grass.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
