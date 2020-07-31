@@ -56,6 +56,22 @@
     padding: 0px;
 }
 
+.block_fuky_left_empty_tunnel
+{
+    background-image: url("../images/mine/texture_50-50_tunnel_left_empty.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
+
+.block_fuky_right_empty_tunnel
+{
+    background-image: url("../images/mine/texture_50-50_tunnel_right_empty.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
+
 .block_fuky_right_gold
 {
     background-image: url("../images/mine/texture_50-50_miner_right_gold.png");
@@ -75,6 +91,38 @@
 .block_stone
 {
     background-image: url("../images/mine/texture_50-50_stone.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
+
+.block_tunnel
+{
+    background-image: url("../images/mine/texture_50-50_tunnel.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
+
+.block_ladder
+{
+    background-image: url("../images/mine/texture_50-50_ladder.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
+
+.block_ladder_miner_empty
+{
+    background-image: url("../images/mine/texture_50-50_ladder_empty.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}
+
+.block_ladder_miner_gold
+{
+    background-image: url("../images/mine/texture_50-50_ladder_miner_gold.png");
     width: 50px;
     height: 50px;
     padding: 0px;
