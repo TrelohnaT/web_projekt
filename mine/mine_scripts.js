@@ -1,7 +1,7 @@
 
 
 /*
-** Verze: 0.1
+** Verze: 1.0
 ** Autor: Václav Doleče
 ** Motivace: Našel jsem v zalíbení ve svaté trojici (HTML,CSS,JS) a tuto hru jsem chtěl už dlouho udělat
 
@@ -25,9 +25,10 @@ var fuky_x;
 var fuky_y;
 
 var gold_own = 0;                   //flag, jestli fuky našel nebo nenašel zlato
+var gold_found = 0;                 //počet vykopaného zlata
 
-var last_block;                      //block který se nacházel na místě kde právě stojí fuky
-var actual_block;
+var last_block;                     //block který se nacházel na místě kde právě stojí fuky
+var actual_block;                   
 
 
 var fuky_actual;                    //aktualní podoba fukyho
@@ -45,6 +46,8 @@ window.onload = (event) => {
 
     document.getElementById("1_1").setAttribute("class", fuky_actual);
 
+    document.getElementById("8_1").setAttribute("class", "block_stack_gold");
+
     fuky_x = 1;
     fuky_y = 1;
 
@@ -61,6 +64,10 @@ window.onload = (event) => {
                 document.getElementById(i + "_" + j).setAttribute("class", "block_stone");
             }
         }
+    }
+    for(var n = 0; n <= 5; n++)
+    {
+        document.getElementById(RNG(10) + "_" + (5 + RNG(5))).setAttribute("class", "block_deposite_gold");
     }
 };
 
@@ -98,7 +105,7 @@ window.addEventListener("keydown", function(event)
     }
     else if(event.key == "q" || event.key == "Q")
     {
-
+        game_logic("q");
     }
     else if(event.key == "e" || event.key == "E")
     {
@@ -110,17 +117,40 @@ window.addEventListener("keydown", function(event)
 /*
 ** zde je mozek celé hry, zde se zpracovávají všechny akce a volají obslužné funkce
 */
-function game_logic(key)
+async function game_logic(key)
 {
     /**Pokud je přijat klič pro pohyb, je zavolána funkce pro pohyb 
      * Input: keyboard input
     */
+    /*
+    ** sleep zde pro natažení herní doby
+    */
+    await sleep(200);
     if(key == "w" || key == "s" || key == "a" || key == "d")
     {
         fuky_move(key);
-        document.getElementById("test").innerHTML ="last: " + last_block;
-        document.getElementById("RNG").innerHTML ="actual: " + actual_block;
-        
+    }
+    else if(key == "q")
+    {
+        if(look_left() == "block_stack_gold" || look_right() == "block_stack_gold")
+        {
+            gold_own = 0;
+            gold_found = gold_found + 1;
+            if(fuky_actual == "block_fuky_right_gold")
+            {
+                document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_fuky_right_empty");
+                return;
+            }
+            else if(fuky_actual == "block_fuky_left_gold")
+            {
+                document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_fuky_left_empty");
+                return;
+            }
+        }
+        else
+        {
+            alert("Need find gold stack")
+        }
     }
 }
 
@@ -133,7 +163,7 @@ function fuky_move(direction)
     if(direction == "w")
     {
         /*tyto IFy bráni v předtím aby hráč vylezl z hrací plochy */
-        if((fuky_y-1) >= 0)
+        if((fuky_y-1) >= min_y)
         {
             /*-1 jedna je vráceno pouze tehdy pokud nelze se posunou do prava */
             if(texture_desider(direction) == -1)
@@ -147,27 +177,39 @@ function fuky_move(direction)
     }
     else if(direction == "s")
     {
-        if((fuky_y+1) <= 9)
+        if(texture_desider(direction) == -1)
         {
-            texture_desider(direction);
+            return;
+        }
+        if((fuky_y+1) <= max_y)
+        {
+            //texture_desider(direction);
             move_y_plus("block_ladder", fuky_actual);
             actual_block = last_block_desider(look_down(), last_block, direction);
         }
     }
     else if(direction == "a")
     {
-       if((fuky_x-1) >= 0)
+        if(texture_desider(direction) == -1)
+        {
+            return;
+        }
+       if((fuky_x-1) >= min_x)
        {
-            texture_desider(direction);
+            //texture_desider(direction);
             actual_block = last_block_desider(look_left(), last_block, direction);    
             move_x_minus(last_block, fuky_actual);;
        }
     }
     else if(direction == "d")
     {
-        if((fuky_x+1) <= 9)
+        if(texture_desider(direction) == -1)
         {
-            texture_desider(direction);
+            return;
+        }
+        if((fuky_x+1) <= max_x)
+        {
+            //texture_desider(direction);
             actual_block = last_block_desider(look_right(), last_block, direction);
             move_x_plus(last_block, fuky_actual);
         }
@@ -183,8 +225,105 @@ function fuky_move(direction)
 */
 function texture_desider(direction)
 {
-    /*pokud hráč našel zlato, změní se jeho textura */
-    if(gold_own == 0)
+    document.getElementById("test").innerHTML = gold_own;
+    /*pokud hrač našel zlato */
+    if(gold_own == 1)
+    {
+        if(direction == "d")
+        {
+            if(look_right() == "block_ladder")
+            {
+                fuky_actual = "block_ladder_miner_gold";
+                return;
+            }
+            else if(look_right() == "block_tunnel" || look_right() == "block_stone")
+            {
+                fuky_actual = "block_fuky_right_gold_tunnel";
+                return;
+            }
+            else if(look_right() == "block_stack_gold")
+            {
+                return -1;
+            }
+            else if(look_right() == "block_deposite_gold")
+            {
+                if(gold_own == 1)
+                {
+                    alert("bag is full");
+                    return -1;
+                }
+            }
+            else
+            {
+                fuky_actual = "block_fuky_right_gold";
+                return;
+            }
+            return;
+        }
+        else if(direction == "a")
+        {
+            if(look_left() == "block_ladder")
+            {
+                fuky_actual = "block_ladder_miner_gold";
+                return;
+            }
+            else if(look_left() == "block_tunnel" || look_left() == "block_stone")
+            {
+                fuky_actual = "block_fuky_left_gold_tunnel";
+                return;
+            }
+            else if(look_left() == "block_stack_gold")
+            {
+                return -1;
+            }
+            else if(look_left() == "block_deposite_gold")
+            {
+                if(gold_own == 1)
+                {
+                    alert("bag is full");
+                    return -1;
+                }
+            }
+            else
+            {
+                fuky_actual = "block_fuky_left_gold";
+                return;
+            }
+            return;
+        }
+        else if(direction == "w")
+        {
+            if(look_up() == "block_ladder")
+            {
+                fuky_actual = "block_ladder_miner_gold";   
+                return;
+            }
+            else
+            {
+                alert("ladder needed");
+                return -1;
+                
+            }
+        }
+        else if(direction == "s")
+        {
+            if(look_down() == "block_deposite_gold")
+            {
+                alert("bag is full");
+                return -1;
+            }
+
+            if(gold_own == 1)
+            {
+                gold_own = 1;
+                fuky_actual == "block_ladder_miner_gold";
+                return;
+            }
+        }
+    } 
+
+    /*pokud hráč ještě nenašel zlato */
+    else if(gold_own == 0)
     {
         /*podle toho jakým směrem se kouká se změní jeho texture (0 -> vpravo, 1 -> vlevo) */
         if(direction == "a")
@@ -192,14 +331,30 @@ function texture_desider(direction)
             if(look_left() == "block_ladder")
             {
                 fuky_actual = "block_ladder_miner_empty";
+                return;
             }
             else if(look_left() == "block_tunnel" || look_left() == "block_stone")
             {
                 fuky_actual = "block_fuky_left_empty_tunnel";
+                return;
+            }
+            else if(look_left() == "block_stack_gold")
+            {
+                return -1;
+            }
+            else if(look_left() == "block_deposite_gold")
+            {
+                if(gold_own == 0)
+                {
+                    gold_own = 1;
+                    fuky_actual = "block_fuky_left_gold_tunnel";
+                    return;
+                }
             }
             else
             {
                 fuky_actual = "block_fuky_left_empty";
+                return;
             }
             return;
         }
@@ -208,22 +363,47 @@ function texture_desider(direction)
             if(look_right() == "block_ladder")
             {
                 fuky_actual = "block_ladder_miner_empty";
+                return;
             }
             else if(look_right() == "block_tunnel" || look_right() == "block_stone")
             {
                 fuky_actual = "block_fuky_right_empty_tunnel";
+                return;
+            }
+            else if(look_right() == "block_stack_gold")
+            {
+                return -1;
+            }
+            else if(look_right() == "block_deposite_gold")
+            {
+                if(gold_own == 0)
+                {
+                    gold_own = 1;
+                    fuky_actual = "block_fuky_right_gold_tunnel";
+                    return;
+                }
             }
             else
             {
                 fuky_actual = "block_fuky_right_empty";
+                return;
             }
             return;
         }
         /**dolu */
         else if(direction == "s")
         {
-            fuky_actual = "block_ladder_miner_empty";
-            return;
+            if(look_down() == "block_deposite_gold" || gold_own == 1)
+            {
+                fuky_actual = "block_ladder_miner_gold";
+                gold_own = 1;
+                return;
+            }
+            else
+            {
+                fuky_actual = "block_ladder_miner_empty";
+                return;
+            }
         }
         /**nahoru */
         else if(direction == "w")
@@ -241,18 +421,6 @@ function texture_desider(direction)
             }
         }
     }
-
-    else if(gold_own == 1)
-    {
-        if(direction == "d")
-        {
-            fuky_actual = "block_fuky_left_gold";
-        }
-        else if(direction == "a")
-        {
-            fuky_actual = "block_fuky_right_gold";
-        } 
-    } 
 }
 
 /*
@@ -348,4 +516,16 @@ function move_y_minus(block_replace, fuky_replace)
     fuky_y = fuky_y-1;
     document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", fuky_replace);
     return;
+}
+
+//tato funkce byla "vypujčena" z internetu (sitepoint)
+function sleep(ms) 
+{
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/*tato taky... */
+function RNG(range)
+{
+    return(Math.floor(Math.random() * range));
 }
