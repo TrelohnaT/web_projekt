@@ -180,3 +180,11 @@
     height: 50px;
     padding: 0px;
 }
+
+.block_fuky_win
+{
+    background-image: url("../images/mine/texture_50-50_miner_win_stance.png");
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+}

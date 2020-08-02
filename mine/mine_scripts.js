@@ -22,6 +22,7 @@ const max_y = 12;
 var fuky_x;
 var fuky_y;
 
+var gold_total = 5;                 //celkem zlatat kolik se vygeneruje
 var gold_own = 0;                   //flag, jestli fuky našel nebo nenašel zlato
 var gold_found = 0;                 //počet vykopaného zlata
 
@@ -70,7 +71,7 @@ window.onload = (event) => {
             }
         }
     }
-    for(var n = 0; n <= 5; n++)
+    for(var n = 0; n < gold_total; n++)
     {
         document.getElementById(RNG(12) + "_" + (5 + RNG(8))).setAttribute("class", "block_deposite_gold");
     }
@@ -115,6 +116,11 @@ window.addEventListener("keydown", async function(event)
     else if(event.key == "e" || event.key == "E")
     {
 
+    }
+
+    if(gold_total == gold_found)
+    {
+        win();
     }
 
 }, true);
@@ -569,6 +575,14 @@ function move_y_minus(block_replace, fuky_replace)
     fuky_y = fuky_y-1;
     document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", fuky_replace);
     return;
+}
+
+/*když nastana výhra, neboli hráč najde všecky zlata */
+
+function win()
+{
+    document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_fuky_win");
+    document.getElementById("test").innerHTML = "Congratulation, you win!!";
 }
 
 //tato funkce byla "vypujčena" z internetu (sitepoint)
