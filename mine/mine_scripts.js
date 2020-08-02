@@ -1,14 +1,12 @@
 
-
 /*
-** Verze: 1.0
-** Autor: Václav Doleče
+** Verze: 1.2
+** Autor: Václav Doleček
 ** Motivace: Našel jsem v zalíbení ve svaté trojici (HTML,CSS,JS) a tuto hru jsem chtěl už dlouho udělat
 
-
 ** Pár slov o pragramu:
-** Věřím že zde jsou některé pasáže které jsou řešeny "dřevorubecky"
-** avšak hlavní když to funguje
+** Věřím že zde jsou některé pasáže které jsou řešeny "dřevorubecky" avšak hlavní když to funguje
+** v HTML a CSS sekci nejsou komentáře, neboť se mi je nechce furt vyklikávat
 
 */
 
@@ -16,10 +14,10 @@
 ** Zde jsou deklarovány globální promněné
 */
 const min_x = 0;
-const max_x = 9;
+const max_x = 12;
 
 const min_y = 0;
-const max_y = 9;
+const max_y = 12;
 
 var fuky_x;
 var fuky_y;
@@ -44,30 +42,37 @@ window.onload = (event) => {
 
     actual_block = "block_empty";
 
-    document.getElementById("1_1").setAttribute("class", fuky_actual);
+    document.getElementById("1_0").setAttribute("class", fuky_actual);
 
-    document.getElementById("8_1").setAttribute("class", "block_stack_gold");
+    document.getElementById("12_0").setAttribute("class", "block_stack_gold");
 
     fuky_x = 1;
-    fuky_y = 1;
+    fuky_y = 0;
 
     for(var i = 0; i <= max_y; i++)
     {
-        for(var j = 2; j <= max_x; j++)
+        for(var j = 1; j <= max_x; j++)
         {
-            if(j == 2)
+            if(j == 1)
             {
                 document.getElementById(i + "_" + j).setAttribute("class", "block_grass");
+                document.getElementById(i + "_" + j).style.opacity = 0.65;
+            }
+            else if(j == 2)
+            {
+                document.getElementById(i + "_" + j).setAttribute("class", "block_stone"); 
+                document.getElementById(i + "_" + j).style.opacity = 0.45;  
             }
             else
             {
-                document.getElementById(i + "_" + j).setAttribute("class", "block_stone");
+                document.getElementById(i + "_" + j).setAttribute("class", "block_stone"); 
+                document.getElementById(i + "_" + j).style.opacity = 0.1;
             }
         }
     }
     for(var n = 0; n <= 5; n++)
     {
-        document.getElementById(RNG(10) + "_" + (5 + RNG(5))).setAttribute("class", "block_deposite_gold");
+        document.getElementById(RNG(12) + "_" + (5 + RNG(8))).setAttribute("class", "block_deposite_gold");
     }
 };
 
@@ -80,9 +85,9 @@ window.onload = (event) => {
 ** vždy načte pouze jednu klávesu
 ** použito pro zjištění vstupu od hráče (uživatele)
 */
-window.addEventListener("keydown", function(event)
+window.addEventListener("keydown", async function(event)
 {
-
+    await sleep(200);
     last_block = actual_block;
     /*
     ** každý IF je pro obshluha jednoho příkazu, program neni Case Sensitive
@@ -117,7 +122,7 @@ window.addEventListener("keydown", function(event)
 /*
 ** zde je mozek celé hry, zde se zpracovávají všechny akce a volají obslužné funkce
 */
-async function game_logic(key)
+function game_logic(key)
 {
     /**Pokud je přijat klič pro pohyb, je zavolána funkce pro pohyb 
      * Input: keyboard input
@@ -125,10 +130,10 @@ async function game_logic(key)
     /*
     ** sleep zde pro natažení herní doby
     */
-    await sleep(200);
     if(key == "w" || key == "s" || key == "a" || key == "d")
     {
         fuky_move(key);
+        opacity_setter();
     }
     else if(key == "q")
     {
@@ -152,6 +157,7 @@ async function game_logic(key)
             alert("Need find gold stack")
         }
     }
+
 }
 
 /*
@@ -172,7 +178,7 @@ function fuky_move(direction)
             }
             actual_block = last_block_desider(look_up(), last_block, direction);
             move_y_minus(last_block, fuky_actual);
-            document.getElementById("test").innerHTML = last_block;
+            return;
         }
     }
     else if(direction == "s")
@@ -183,9 +189,9 @@ function fuky_move(direction)
         }
         if((fuky_y+1) <= max_y)
         {
-            //texture_desider(direction);
-            move_y_plus("block_ladder", fuky_actual);
             actual_block = last_block_desider(look_down(), last_block, direction);
+            move_y_plus("block_ladder", fuky_actual);
+            return;
         }
     }
     else if(direction == "a")
@@ -194,11 +200,11 @@ function fuky_move(direction)
         {
             return;
         }
-       if((fuky_x-1) >= min_x)
+       else if((fuky_x-1) >= min_x)
        {
-            //texture_desider(direction);
             actual_block = last_block_desider(look_left(), last_block, direction);    
             move_x_minus(last_block, fuky_actual);;
+            return;
        }
     }
     else if(direction == "d")
@@ -209,9 +215,9 @@ function fuky_move(direction)
         }
         if((fuky_x+1) <= max_x)
         {
-            //texture_desider(direction);
             actual_block = last_block_desider(look_right(), last_block, direction);
             move_x_plus(last_block, fuky_actual);
+            return;
         }
     }
 }
@@ -313,10 +319,10 @@ function texture_desider(direction)
                 return -1;
             }
 
-            if(gold_own == 1)
+            else if(gold_own == 1)
             {
                 gold_own = 1;
-                fuky_actual == "block_ladder_miner_gold";
+                fuky_actual = "block_ladder_miner_gold";
                 return;
             }
         }
@@ -356,7 +362,6 @@ function texture_desider(direction)
                 fuky_actual = "block_fuky_left_empty";
                 return;
             }
-            return;
         }
         else if(direction == "d")
         {
@@ -451,6 +456,54 @@ function last_block_desider(future, past, direction)
         else
         {
             return("block_tunnel");
+        }
+    }
+}
+
+/*
+** tato funkce mění opacity bloku, tedy viditelnost podletoho jak se fuky pohybuje
+** Input: global fuky_x, fuky_y
+** Output: jiné opacity bloků okolo fukyho
+*/
+function opacity_setter()
+{
+    /*blok hráče bude vždy maximálně viditelný*/
+    document.getElementById(fuky_x + "_" + fuky_y).style.opacity = 1;
+
+    /*okolní bloky budou taky viditelné ale ne tak jasně, kromě grass blocku, ten bude viditelny furt stejně 
+    ** nejdří se zkontroluje, zda-li je tím směrem ještě blok na který se dá dívet se
+    ** poté se zkontroluje zda-li blok tím směrem není block_grass a jestli nejsem na hladině 0(tam je opaciti furt stejná)
+    */
+    if((fuky_x+1) <= max_x)
+    {
+        if(look_right() != "block_grass" && fuky_y != 0)
+        {
+            document.getElementById((fuky_x + 1) + "_" + fuky_y).style.opacity = 0.65;
+        }
+    }
+
+    if((fuky_x-1) >= min_x)
+    {
+        if(look_left() != "block_grass" && fuky_y != 0)
+        {
+            document.getElementById((fuky_x - 1) + "_" + fuky_y).style.opacity = 0.65;
+        }
+    }
+
+    if((fuky_y-1) >= min_y)
+    {
+        /*zde je výjimka a kontroluje se zdali není hladina 1 neboť tato funkce se volá až po posunutí hráče, tedy při posunutí dolu je už hráč na hladině 1 při volání teto funkce */
+        if(look_up() != "block_grass" && fuky_y != 1)
+        {
+            document.getElementById(fuky_x + "_" + (fuky_y - 1)).style.opacity = 0.65;
+        }
+    }
+    
+    if((fuky_y+1) <= max_y)
+    {
+        if(look_down() != "block_grass")
+        {
+            document.getElementById(fuky_x + "_" + (fuky_y + 1)).style.opacity = 0.65;
         }
     }
 }
