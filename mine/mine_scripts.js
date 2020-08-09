@@ -7,6 +7,91 @@
 ** Pár slov o pragramu:
 ** Věřím že zde jsou některé pasáže které jsou řešeny "dřevorubecky" avšak hlavní když to funguje
 ** v HTML a CSS sekci nejsou komentáře, neboť se mi je nechce furt vyklikávat
+*/
+
+/*
+** Legenda pro všechny promněné a funkce
+* Promněnné:
+
+** souřadnice:
+*** min/max_x/y => zde jsou uloženy rozměry hrací plochy
+*** fuky_x/y    => zde je uložena aktuální pozice fukyho(hráče)
+
+** textury:
+*** fuky_actual     => název aktuálního fuky bloku(aktuální textury, viz CSS)
+*** actual_block    => název bloku na kterém fuky momentálně stojí(byl změněn na texturu hráče)
+*** last_block      => nazev posledního bloku kde se hráč nacházel
+
+** gold mechanika:
+*** gold_own        => flag určující zda-li hráč nalezl zlato, používá se při výběru textury hráče
+*** gold_total      => celkový počet zlata, používá se při generování a při zjištění výhry
+*** gold_found      => počet zlata které už hráč našel a donesl, používá se při zjištění výhry
+
+* základní funkce:
+
+** game_logic(key)
+*** input: key => znak stlačené klávesy
+**** podle stisknuté klávesy volá funkce fuky_move(key) nebo opacity_setter() a nebo obsluhuje požadavek (při stalčení q nebo Q)
+
+** fuky_move(key)
+*** input: key => znak stlačené klávesy
+**** podle stisknuté klávesy volá funkce podpurné funkce pro pohyb (texture desider(direction), actual_block_desider(future, past, direction)) a následně funkci pro pohyb samotnou (move_x/y_plus/minus(x, y, block_replace, person_replace))
+
+*pohybové funkce:
+
+** texture_desider(direction)
+*** input: direction        => směr kterým se chce hráč pohnut (w,s,a,d)
+*** output: -1              => pouze pokud pohyb není možný
+**** nastavuje hodnotu fuky_actual podle toho kam se chce hráč pohnout a to tak, že volá pomocné funkce
+look_left/look_right/look_up/look_down(x,y) a kterým se podívá, na jaký blok se hráč má pohnout.
+Podle jako texturu hráč bude mít(resp. následují blok kam se hráč pohne) v závislosti na hodnotě v
+promněné gold_own a jestli je pohyb vubec možný
+
+** actual_block_desider(future, past, direction)
+*** input: future           => blok kam se chce hráč posunout
+*** input: past             => last_block
+*** input: direction        => směr kterým se chce hráč posunout
+*** output:                 => název bloku který bude novým actual_block
+**** na základě vstupních argumentu rozhodne, jaky blok bude v actual_block, resp. jaký blok
+by byl na místě kde je teď hráč kdyby tam hráč nebyl, resp. jaký blok bude na místě hráče
+až se hráč pohne z něj pryč
+
+** move_x_plus/move_x_minus/move_y_plus/move_y_minus(x, y, block_replace, person_replace)
+*** input: x                => souřadnice osy X pohybovaného bloku
+*** input: y                => souřadnice osy Y pohybovaného bloku
+*** input: block_replace    => název bloku který bude na místě pohybovaného bloku
+*** input: person_replace   => název ploku který bude na novém místě(tam kde se hráč pohne)
+**** mění actual_block na last_block
+**** samotný pohyb je vykonán pouze přehozením textur
+
+** look_left/look_right/look_up/look_donw(x, y)
+*** input: x                => souřadnice osy X bloku ze kterého se dívám
+*** input: y                => souřadnice osy Y bloku ze kterého se dívám
+*** output:                 => název bloku který na který se dívám
+**** funkce vzme aktuální souřadnice bloku ze kterého se dívám a přičte/odečte k nim 1 podle toho kterým
+směrem se chci podívat. Následně vrátí název bloku který ležícího tím směrem. Pokud tam žádný blok není, vrácí nono_defined(nebo tak něco)
+
+* viditelnost:
+
+** opacity_setter()
+*** input/output: none
+**** nastavuej opacity bloku hráče a jeho okolí, to ma za následek to, že hrač vidí pouze to kde už byl
+fuknce nastaví opacity aktuálního bloku na hodnotu 1 a okolních na hodnout 0.65
+
+* Ostatní:
+
+** win()
+*** input/output: none
+**** nastaví block hráče na block pro vítěství (viž CSS)
+
+** sleep(ms)
+*** input: ms               => počet milisekund které se čeká
+**** funkce pozastaví program na požadovaný počet milisekudn
+
+** RNG(range)
+*** input: range            => rozsah ze kterého chceme vybrat jedno náhodné číslo
+*** output: [čislo]         => náhodné číslo ze zadaného rozsahu
+**** funkce vybere jedno náhodné číslo ze zadaného rozsahu
 
 */
 
@@ -28,7 +113,6 @@ var gold_found = 0;                 //počet vykopaného zlata
 
 var last_block;                     //block který se nacházel na místě kde právě stojí fuky
 var actual_block;                   
-
 
 var fuky_actual;                    //aktualní podoba fukyho
 
@@ -143,7 +227,7 @@ function game_logic(key)
     }
     else if(key == "q")
     {
-        if(look_left() == "block_stack_gold" || look_right() == "block_stack_gold")
+        if(look_left(fuky_x, fuky_y) == "block_stack_gold" || look_right(fuky_x, fuky_y) == "block_stack_gold")
         {
             gold_own = 0;
             gold_found = gold_found + 1;
@@ -182,8 +266,8 @@ function fuky_move(direction)
             {
                 return;
             }
-            actual_block = last_block_desider(look_up(), last_block, direction);
-            move_y_minus(last_block, fuky_actual);
+            actual_block = actual_block_desider(look_up(fuky_x, fuky_y), last_block, direction);
+            fuky_y = move_y_minus(fuky_x, fuky_y, last_block, fuky_actual);
             return;
         }
     }
@@ -195,8 +279,8 @@ function fuky_move(direction)
         }
         if((fuky_y+1) <= max_y)
         {
-            actual_block = last_block_desider(look_down(), last_block, direction);
-            move_y_plus("block_ladder", fuky_actual);
+            actual_block = actual_block_desider(look_down(fuky_x, fuky_y), last_block, direction);
+            fuky_y = move_y_plus(fuky_x, fuky_y, "block_ladder", fuky_actual);
             return;
         }
     }
@@ -208,8 +292,8 @@ function fuky_move(direction)
         }
        else if((fuky_x-1) >= min_x)
        {
-            actual_block = last_block_desider(look_left(), last_block, direction);    
-            move_x_minus(last_block, fuky_actual);;
+            actual_block = actual_block_desider(look_left(fuky_x, fuky_y), last_block, direction);    
+            fuky_x = move_x_minus(fuky_x, fuky_y, last_block, fuky_actual);;
             return;
        }
     }
@@ -221,8 +305,8 @@ function fuky_move(direction)
         }
         if((fuky_x+1) <= max_x)
         {
-            actual_block = last_block_desider(look_right(), last_block, direction);
-            move_x_plus(last_block, fuky_actual);
+            actual_block = actual_block_desider(look_right(fuky_x, fuky_y), last_block, direction);
+            fuky_x = move_x_plus(fuky_x, fuky_y, last_block, fuky_actual);
             return;
         }
     }
@@ -243,21 +327,21 @@ function texture_desider(direction)
     {
         if(direction == "d")
         {
-            if(look_right() == "block_ladder")
+            if(look_right(fuky_x, fuky_y) == "block_ladder")
             {
                 fuky_actual = "block_ladder_miner_gold";
                 return;
             }
-            else if(look_right() == "block_tunnel" || look_right() == "block_stone")
+            else if(look_right(fuky_x, fuky_y) == "block_tunnel" || look_right(fuky_x, fuky_y) == "block_stone" ||look_right(fuky_x, fuky_y) == "block_grass")
             {
                 fuky_actual = "block_fuky_right_gold_tunnel";
                 return;
             }
-            else if(look_right() == "block_stack_gold")
+            else if(look_right(fuky_x, fuky_y) == "block_stack_gold")
             {
                 return -1;
             }
-            else if(look_right() == "block_deposite_gold")
+            else if(look_right(fuky_x, fuky_y) == "block_deposite_gold")
             {
                 if(gold_own == 1)
                 {
@@ -274,21 +358,21 @@ function texture_desider(direction)
         }
         else if(direction == "a")
         {
-            if(look_left() == "block_ladder")
+            if(look_left(fuky_x, fuky_y) == "block_ladder")
             {
                 fuky_actual = "block_ladder_miner_gold";
                 return;
             }
-            else if(look_left() == "block_tunnel" || look_left() == "block_stone")
+            else if(look_left(fuky_x, fuky_y) == "block_tunnel" || look_left(fuky_x, fuky_y) == "block_stone" || look_left(fuky_x, fuky_y) == "block_grass")
             {
                 fuky_actual = "block_fuky_left_gold_tunnel";
                 return;
             }
-            else if(look_left() == "block_stack_gold")
+            else if(look_left(fuky_x, fuky_y) == "block_stack_gold")
             {
                 return -1;
             }
-            else if(look_left() == "block_deposite_gold")
+            else if(look_left(fuky_x, fuky_y) == "block_deposite_gold")
             {
                 if(gold_own == 1)
                 {
@@ -305,7 +389,7 @@ function texture_desider(direction)
         }
         else if(direction == "w")
         {
-            if(look_up() == "block_ladder")
+            if(look_up(fuky_x, fuky_y) == "block_ladder")
             {
                 fuky_actual = "block_ladder_miner_gold";   
                 return;
@@ -319,7 +403,7 @@ function texture_desider(direction)
         }
         else if(direction == "s")
         {
-            if(look_down() == "block_deposite_gold")
+            if(look_down(fuky_x, fuky_y) == "block_deposite_gold")
             {
                 alert("bag is full");
                 return -1;
@@ -340,21 +424,21 @@ function texture_desider(direction)
         /*podle toho jakým směrem se kouká se změní jeho texture (0 -> vpravo, 1 -> vlevo) */
         if(direction == "a")
         {
-            if(look_left() == "block_ladder")
+            if(look_left(fuky_x, fuky_y) == "block_ladder")
             {
                 fuky_actual = "block_ladder_miner_empty";
                 return;
             }
-            else if(look_left() == "block_tunnel" || look_left() == "block_stone")
+            else if(look_left(fuky_x, fuky_y) == "block_tunnel" || look_left(fuky_x, fuky_y) == "block_stone" || look_left(fuky_x, fuky_y) == "block_grass")
             {
                 fuky_actual = "block_fuky_left_empty_tunnel";
                 return;
             }
-            else if(look_left() == "block_stack_gold")
+            else if(look_left(fuky_x, fuky_y) == "block_stack_gold")
             {
                 return -1;
             }
-            else if(look_left() == "block_deposite_gold")
+            else if(look_left(fuky_x, fuky_y) == "block_deposite_gold")
             {
                 if(gold_own == 0)
                 {
@@ -371,21 +455,21 @@ function texture_desider(direction)
         }
         else if(direction == "d")
         {
-            if(look_right() == "block_ladder")
+            if(look_right(fuky_x, fuky_y) == "block_ladder")
             {
                 fuky_actual = "block_ladder_miner_empty";
                 return;
             }
-            else if(look_right() == "block_tunnel" || look_right() == "block_stone")
+            else if(look_right(fuky_x, fuky_y) == "block_tunnel" || look_right(fuky_x, fuky_y) == "block_stone" || look_right(fuky_x, fuky_y) == "block_grass")
             {
                 fuky_actual = "block_fuky_right_empty_tunnel";
                 return;
             }
-            else if(look_right() == "block_stack_gold")
+            else if(look_right(fuky_x, fuky_y) == "block_stack_gold")
             {
                 return -1;
             }
-            else if(look_right() == "block_deposite_gold")
+            else if(look_right(fuky_x, fuky_y) == "block_deposite_gold")
             {
                 if(gold_own == 0)
                 {
@@ -404,7 +488,7 @@ function texture_desider(direction)
         /**dolu */
         else if(direction == "s")
         {
-            if(look_down() == "block_deposite_gold" || gold_own == 1)
+            if(look_down(fuky_x, fuky_y) == "block_deposite_gold" || gold_own == 1)
             {
                 fuky_actual = "block_ladder_miner_gold";
                 gold_own = 1;
@@ -419,7 +503,7 @@ function texture_desider(direction)
         /**nahoru */
         else if(direction == "w")
         {
-            if(look_up() == "block_ladder")
+            if(look_up(fuky_x, fuky_y) == "block_ladder")
             {
                 fuky_actual = "block_ladder_miner_empty";   
                 return;
@@ -439,7 +523,7 @@ function texture_desider(direction)
 ** v podobě else if jsou implementovány veškeré výjimky
 ** Input: future - boudí blok kam se chce posunout, last - minulý blok kam se už posunul 
 */
-function last_block_desider(future, past, direction)
+function actual_block_desider(future, past, direction)
 {
     if(direction == "s" || direction == "w")
     {
@@ -482,7 +566,7 @@ function opacity_setter()
     */
     if((fuky_x+1) <= max_x)
     {
-        if(look_right() != "block_grass" && fuky_y != 0)
+        if(look_right(fuky_x, fuky_y) != "block_grass" && fuky_y != 0)
         {
             document.getElementById((fuky_x + 1) + "_" + fuky_y).style.opacity = 0.65;
         }
@@ -490,7 +574,7 @@ function opacity_setter()
 
     if((fuky_x-1) >= min_x)
     {
-        if(look_left() != "block_grass" && fuky_y != 0)
+        if(look_left(fuky_x, fuky_y) != "block_grass" && fuky_y != 0)
         {
             document.getElementById((fuky_x - 1) + "_" + fuky_y).style.opacity = 0.65;
         }
@@ -499,7 +583,7 @@ function opacity_setter()
     if((fuky_y-1) >= min_y)
     {
         /*zde je výjimka a kontroluje se zdali není hladina 1 neboť tato funkce se volá až po posunutí hráče, tedy při posunutí dolu je už hráč na hladině 1 při volání teto funkce */
-        if(look_up() != "block_grass" && fuky_y != 1)
+        if(look_up(fuky_x, fuky_y) != "block_grass" && fuky_y != 1)
         {
             document.getElementById(fuky_x + "_" + (fuky_y - 1)).style.opacity = 0.65;
         }
@@ -507,7 +591,7 @@ function opacity_setter()
     
     if((fuky_y+1) <= max_y)
     {
-        if(look_down() != "block_grass")
+        if(look_down(fuky_x, fuky_y) != "block_grass")
         {
             document.getElementById(fuky_x + "_" + (fuky_y + 1)).style.opacity = 0.65;
         }
@@ -516,65 +600,65 @@ function opacity_setter()
 
 
 /*nahlédnutí jaký blok se nachází nalevo */
-function look_left()
+function look_left(x,y)
 {
-    return(document.getElementById((fuky_x-1) + "_" + fuky_y).getAttribute("class"));
+    return(document.getElementById((x-1) + "_" + y).getAttribute("class"));
 }
 
 /*nahlednutí jaký blok se nachází v pravo */
-function look_right()
+function look_right(x, y)
 {
-    return(document.getElementById((fuky_x+1) + "_" + fuky_y).getAttribute("class"));
+    return(document.getElementById((x+1) + "_" + y).getAttribute("class"));
 }
 
 /*nahlednutí jaky blok se nachazí nad ním */
-function look_up()
+function look_up(x, y)
 {
-    return(document.getElementById(fuky_x + "_" + (fuky_y-1)).getAttribute("class"));
+    return(document.getElementById(x + "_" + (y-1)).getAttribute("class"));
 }
 
 /*nahlednutí jaky blok se nachazí pod ním */
-function look_down()
+function look_down(x, y)
 {
-    return(document.getElementById(fuky_x + "_" + (fuky_y+1)).getAttribute("class"));
+    return(document.getElementById(x + "_" + (y+1)).getAttribute("class"));
 }
 
 
 
-function move_x_plus(block_replace, fuky_replace)
+function move_x_plus(x, y, block_replace, person_replace)
 {
-    document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", block_replace);
-    last_block = document.getElementById(fuky_x + "_" + fuky_y).getAttribute("class");
-    fuky_x = fuky_x+1;
-    document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", fuky_replace);
-    return;
+    document.getElementById(x + "_" + y).setAttribute("class", block_replace);
+    last_block = document.getElementById(x + "_" + y).getAttribute("class");
+    x = x+1;
+    document.getElementById(x + "_" + y).setAttribute("class", person_replace);
+    return(x);
 }
 
-function move_x_minus(block_replace, fuky_replace)
+function move_x_minus(x, y, block_replace, person_replace)
 {
-    document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", block_replace);
-    last_block = document.getElementById(fuky_x + "_" + fuky_y).getAttribute("class");
-    fuky_x = fuky_x-1;
-    document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", fuky_replace);
-    return;
+    document.getElementById(x + "_" + y).setAttribute("class", block_replace);
+    last_block = document.getElementById(x + "_" + y).getAttribute("class");
+    x = x-1;
+    document.getElementById(x + "_" + y).setAttribute("class", person_replace);
+    return(x);
 }
 
-function move_y_plus(block_replace, fuky_replace)
+function move_y_plus(x, y, block_replace, person_replace)
 {
-    document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", block_replace);
-    last_block = document.getElementById(fuky_x + "_" + fuky_y).getAttribute("class");
-    fuky_y = fuky_y+1;
-    document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", fuky_replace);
-    return;
+    document.getElementById(x + "_" + y).setAttribute("class", block_replace);
+    last_block = document.getElementById(x + "_" + y).getAttribute("class");
+    y = y+1;
+    document.getElementById(x + "_" + y).setAttribute("class", person_replace);
+    return(y);
 }
 
-function move_y_minus(block_replace, fuky_replace)
+function move_y_minus(x, y, block_replace, person_replace)
 {
-    document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", block_replace);
-    last_block = document.getElementById(fuky_x + "_" + fuky_y).getAttribute("class");
-    fuky_y = fuky_y-1;
-    document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", fuky_replace);
-    return;
+    document.getElementById(x + "_" + y).setAttribute("class", block_replace);
+    last_block = document.getElementById(x + "_" + y).getAttribute("class");
+    y = y-1;
+    document.getElementById(x + "_" + y).setAttribute("class", person_replace);
+    return(y);
 }
 
 /*když nastana výhra, neboli hráč najde všecky zlata */
@@ -585,13 +669,13 @@ function win()
     document.getElementById("test").innerHTML = "Congratulation, you win!!";
 }
 
-//tato funkce byla "vypujčena" z internetu (sitepoint)
+
 function sleep(ms) 
 {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/*tato taky... */
+
 function RNG(range)
 {
     return(Math.floor(Math.random() * range));
