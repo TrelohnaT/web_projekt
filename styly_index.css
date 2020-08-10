@@ -12,6 +12,7 @@
     margin-left: 2%;
     margin-right: 2%;
     background-image: url("images/PpP_index_back.png");
+    
 }
 
 .block
@@ -38,7 +39,7 @@
 
 .welcome p
 {
-    width: 80%;
+    width: 82%;
     margin: 0px;
     margin-left: 10%;
     font-size: 28px;
@@ -53,6 +54,11 @@
     text-align: center;
 }
 
+.menu a
+{
+    text-decoration: none;
+}
+
 .menu p
 {
     margin: 0px;
@@ -62,34 +68,37 @@
     font-weight: bolder;
 }
 
-.fuky
+#o_mne
 {
-    text-align: center;
-    width: 200px;
+    width: 90%;
     height: 200px;
-    background-color: pink;
-}
-
-
-.o_mne
-{
-    width: 200px;
-    height: 200px;
+    margin: 2%;
+    margin-left: 5%;
     background-color: orange;
+    text-align: left;
 }
 
-.farm
+#o_mne .themplate
 {
     width: 200px;
     height: 200px;
-    background-color: limegreen;
+    background-color: black;
 }
 
-.mine
+#menu_part_picture
 {
-    width: 200px;
+    width: 42%;
     height: 200px;
-    background-color: darkgray;
+    background-image: url(".//images/Miner_themplate.png");
+    background-repeat: no-repeat;
+    background-size: auto;
+}
+
+#mine
+{
+    width: 90%;
+    margin-left: 5%;
+    background-color: lightgrey;
 }
 
 .foot
