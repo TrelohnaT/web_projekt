@@ -94,11 +94,54 @@
     background-size: auto;
 }
 
+#menu_part_text
+{
+    margin-left: 2%;
+    margin-right: 2%;
+    width: 50%;
+    text-align: left;
+    color: black;
+}
+
+#menu_part_text p
+{
+    font-size: x-large;
+}
+
+#sample_text_miner_p1
+{
+    display: none;
+}
+
+#sample_text_miner_p2
+{
+    display: none;
+}
+
+#sample_text_miner_p3
+{
+    display: none;
+}
+
 #mine
 {
+    text-align: left;
     width: 90%;
+    height: 200px;
     margin-left: 5%;
-    background-color: lightgrey;
+    background-color: darkgrey;
+    display: flex;
+}
+
+#mine:hover
+{
+    text-align: left;
+    width: 90%;
+    height: 200px;
+    margin-left: 5%;
+    background-color: darkgrey;
+    display: flex;
+    border: solid darkorange;
 }
 
 .foot
