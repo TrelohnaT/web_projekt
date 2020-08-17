@@ -4,8 +4,11 @@
 
  */
 
+/*
+** block = 1 => uživatel zvolil první blok
+ */
 
-async function mouse_in(block)
+function mouse_in(block)
 {
     if(block == 1)
     {

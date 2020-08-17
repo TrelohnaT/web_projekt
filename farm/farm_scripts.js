@@ -61,7 +61,7 @@ async function move_to_dest()
 
 function move_x_plus()
 {
-    if(dest_y >= 0 && dest_y <= 9)
+    if(dest_y >= 0 && dest_y <= 12)
     {
         document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_field");
         fuky_x = fuky_x+1;
@@ -74,7 +74,7 @@ function move_x_plus()
 
 function move_x_minus()
 {
-    if(dest_y >= 0 && dest_y <= 9)
+    if(dest_y >= 0 && dest_y <= 12)
     {
         document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_field");
         fuky_x = fuky_x-1;
@@ -87,7 +87,7 @@ function move_x_minus()
 
 function move_y_plus()
 {
-    if(dest_y >= 0 && dest_y <= 9)
+    if(dest_y >= 0 && dest_y <= 12)
     {
         document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_field");
         fuky_y = fuky_y+1;
@@ -100,7 +100,7 @@ function move_y_plus()
 
 function move_y_minus()
 {
-    if(dest_y >= 0 && dest_y <= 9)
+    if(dest_y >= 0 && dest_y <= 12)
     {
         document.getElementById(fuky_x + "_" + fuky_y).setAttribute("class", "block_field");
         fuky_y = fuky_y-1;
